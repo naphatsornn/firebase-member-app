@@ -9,7 +9,7 @@ export default function Dashboard() {
   const [phone, setPhone] = useState("");
   const [name, setName] = useState(null);
   const [notFound, setNotFound] = useState(false);
-  const [externalResult, setExternalResult] = useState(null); // ✅ เก็บผลจาก API ภายนอก
+  const [externalResult, setExternalResult] = useState(null);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -38,7 +38,6 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ ดึง Firebase token แล้วเรียก API ภายนอก
   const callExternalApi = async () => {
     const user = auth.currentUser;
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
@@ -46,7 +45,7 @@ export default function Dashboard() {
     try {
       const token = await user.getIdToken();
 
-      const res = await fetch("https://api.example.com/member", {
+      const res = await fetch("/api/protected", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -98,7 +97,6 @@ export default function Dashboard() {
           <p className="mt-4 text-red-500">ไม่พบข้อมูล</p>
         )}
 
-        {/* ✅ ปุ่มเรียก API ภายนอก */}
         <button
           onClick={callExternalApi}
           className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
@@ -106,7 +104,6 @@ export default function Dashboard() {
           เรียก API ภายนอก
         </button>
 
-        {/* ✅ แสดงผลลัพธ์จาก API */}
         {externalResult && (
           <pre className="mt-4 bg-gray-100 p-4 rounded text-sm overflow-auto">
             {JSON.stringify(externalResult, null, 2)}

@@ -1,3 +1,5 @@
+// pages/api/protected.js
+
 import admin from "../../lib/firebaseAdmin";
 
 export default async function handler(req, res) {
@@ -10,16 +12,22 @@ export default async function handler(req, res) {
   const token = authHeader.split("Bearer ")[1];
 
   try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    const uid = decoded.uid;
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const uid = decodedToken.uid;
 
-    // ✅ ผ่าน token verification แล้ว
-    res.status(200).json({
+    // Optional: ดึงข้อมูลผู้ใช้จาก Firestore ถ้ามี
+    const userDoc = await admin.firestore().collection("users").doc(uid).get();
+    const userData = userDoc.exists ? userDoc.data() : null;
+
+    // ส่งข้อมูลกลับ
+    return res.status(200).json({
       message: "Access granted ✅",
       uid,
-      email: decoded.email,
+      email: decodedToken.email,
+      userData,
     });
-  } catch (err) {
-    res.status(403).json({ error: "Invalid or expired token" });
+  } catch (error) {
+    console.error("❌ Token verification failed:", error);
+    return res.status(403).json({ error: "Invalid or expired token" });
   }
 }
