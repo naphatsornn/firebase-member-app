@@ -38,24 +38,25 @@ export default function Dashboard() {
     }
   };
 
-  const callExternalApi = async () => {
+  // ✅ ฟังก์ชันเดียว สำหรับดึง token → ส่งไปยัง /api/protected
+  const fetchTokenFromHeader = async () => {
     const user = auth.currentUser;
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
 
     try {
-      const token = await user.getIdToken(true); // 🔥 force refresh token
+      const token = await user.getIdToken(true); // 🔥 force refresh
 
       const res = await fetch("/api/protected", {
-        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await res.json();
+      console.log("✅ Token response:", data);
       setExternalResult(data);
     } catch (err) {
-      console.error("API ERROR:", err);
+      console.error("❌ ERROR:", err);
       setExternalResult({ error: "เรียก API ไม่สำเร็จ" });
     }
   };
@@ -87,21 +88,25 @@ export default function Dashboard() {
             ค้นหา
           </button>
         </form>
+         <button
+  onClick={fetchTokenFromHeader}
+  className="mt-4 bg-gray-700 text-white px-4 py-2 rounded"
+>
+  ดึง Token จาก Header
+</button>
 
         {name && (
           <p className="mt-4 text-green-600 font-semibold">
             ชื่อสมาชิก: {name}
           </p>
         )}
-        {notFound && (
-          <p className="mt-4 text-red-500">ไม่พบข้อมูล</p>
-        )}
+        {notFound && <p className="mt-4 text-red-500">ไม่พบข้อมูล</p>}
 
         <button
-          onClick={callExternalApi}
+          onClick={fetchTokenFromHeader}
           className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
         >
-          เรียก API ภายนอก
+          ดึง Token จาก Header
         </button>
 
         {externalResult && (
