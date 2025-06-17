@@ -43,7 +43,7 @@ export default function Dashboard() {
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
 
     try {
-      const token = await user.getIdToken();
+      const token = await user.getIdToken(true); // 🔥 force refresh token
 
       const res = await fetch("/api/protected", {
         method: "GET",
