@@ -1,15 +1,27 @@
 import { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/router";
 
 export default function Dashboard() {
   const router = useRouter();
+
   const [phone, setPhone] = useState("");
   const [name, setName] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [externalResult, setExternalResult] = useState(null);
+
+  const [newPhone, setNewPhone] = useState("");
+  const [newName, setNewName] = useState("");
+  const [addMessage, setAddMessage] = useState(null);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -44,7 +56,6 @@ export default function Dashboard() {
 
     try {
       const token = await user.getIdToken(true); // 🔥 force refresh
-
       const res = await fetch("/api/protected", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -57,6 +68,25 @@ export default function Dashboard() {
     } catch (err) {
       console.error("❌ ERROR:", err);
       setExternalResult({ error: "เรียก API ไม่สำเร็จ" });
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!newPhone || !newName) {
+      return setAddMessage("❌ กรุณากรอกชื่อและเบอร์ให้ครบ");
+    }
+
+    try {
+      await setDoc(doc(db, "users", newPhone), {
+        phone: newPhone,
+        name: newName,
+      });
+      setAddMessage("✅ เพิ่มสมาชิกสำเร็จ");
+      setNewPhone("");
+      setNewName("");
+    } catch (err) {
+      console.error(err);
+      setAddMessage("❌ เพิ่มสมาชิกไม่สำเร็จ");
     }
   };
 
@@ -95,7 +125,6 @@ export default function Dashboard() {
         )}
         {notFound && <p className="mt-4 text-red-500">ไม่พบข้อมูล</p>}
 
-        {/* ✅ ปุ่มเดียวพอ */}
         <button
           onClick={fetchTokenFromHeader}
           className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
@@ -107,6 +136,36 @@ export default function Dashboard() {
           <pre className="mt-4 bg-gray-100 p-4 rounded text-sm overflow-auto">
             {JSON.stringify(externalResult, null, 2)}
           </pre>
+        )}
+
+        <hr className="my-6" />
+        <h2 className="text-xl font-semibold text-center mb-2">
+          เพิ่มสมาชิกใหม่
+        </h2>
+        <input
+          type="text"
+          placeholder="เบอร์โทรใหม่"
+          value={newPhone}
+          onChange={(e) => setNewPhone(e.target.value)}
+          className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+        />
+        <input
+          type="text"
+          placeholder="ชื่อสมาชิกใหม่"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          className="w-full border border-gray-300 rounded px-4 py-2 mb-2"
+        />
+        <button
+          onClick={handleAddMember}
+          className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+        >
+          เพิ่มสมาชิก
+        </button>
+        {addMessage && (
+          <p className="mt-2 text-center text-sm text-gray-700">
+            {addMessage}
+          </p>
         )}
       </div>
     </div>
