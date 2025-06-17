@@ -38,7 +38,6 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ ฟังก์ชันเดียว สำหรับดึง token → ส่งไปยัง /api/protected
   const fetchTokenFromHeader = async () => {
     const user = auth.currentUser;
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
@@ -88,12 +87,6 @@ export default function Dashboard() {
             ค้นหา
           </button>
         </form>
-         <button
-  onClick={fetchTokenFromHeader}
-  className="mt-4 bg-gray-700 text-white px-4 py-2 rounded"
->
-  ดึง Token จาก Header
-</button>
 
         {name && (
           <p className="mt-4 text-green-600 font-semibold">
@@ -102,6 +95,7 @@ export default function Dashboard() {
         )}
         {notFound && <p className="mt-4 text-red-500">ไม่พบข้อมูล</p>}
 
+        {/* ✅ ปุ่มเดียวพอ */}
         <button
           onClick={fetchTokenFromHeader}
           className="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
