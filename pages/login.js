@@ -91,3 +91,15 @@ export default function Login() {
     </div>
   );
 }
+const user = auth.currentUser;
+if (user) {
+  const token = await user.getIdToken(true); // refresh token
+  const res = await fetch("/api/protected", {
+    headers: {
+      "authorization": `Bearer ${token}`,
+      "tmn-access-token": token,
+    },
+  });
+  const data = await res.json();
+  console.log(data);
+}
