@@ -22,22 +22,25 @@ export default function Login() {
     }
   };
 
-  // ✅ เพิ่มฟังก์ชันดึง token ไป API
+  // ✅ ฟังก์ชันกดปุ่ม "ดึง Token ไป API"
   const handleGetToken = async () => {
     const user = auth.currentUser;
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
 
     try {
-      const token = await user.getIdToken(true);
+      const token = await user.getIdToken(true); // 🔥 refresh token เสมอ
       const res = await fetch("/api/protected", {
         method: "GET",
         headers: {
-          authorization: `Bearer ${token}`,
-          "tmn-access-token": token,
+          "authorization": `Bearer ${token}`,   // มาตรฐาน Firebase
+          "tmn-access-token": token,            // custom header
+          "x-access-token": token               // fallback อีกแบบ
         },
       });
+
       const data = await res.json();
       setTokenResponse(data);
+      console.log("🎉 Token ส่งสำเร็จ:", data);
     } catch (err) {
       console.error("❌ ดึง token ไม่สำเร็จ", err);
       setTokenResponse({ error: "❌ ดึง token ไม่สำเร็จ" });
@@ -90,16 +93,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
-const user = auth.currentUser;
-if (user) {
-  const token = await user.getIdToken(true); // refresh token
-  const res = await fetch("/api/protected", {
-    headers: {
-      "authorization": `Bearer ${token}`,
-      "tmn-access-token": token,
-    },
-  });
-  const data = await res.json();
-  console.log(data);
 }
