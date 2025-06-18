@@ -1,16 +1,20 @@
 // pages/api/protected.js
 
 export default async function handler(req, res) {
-  const authHeader = req.headers.authorization;
+  // 🔍 รองรับทุกเคสของ token ที่อาจส่งมา
+  const token =
+    req.headers["tmn-access-token"] ||                       // 🔸 TrueMoney mini app
+    req.headers["x-access-token"] ||                         // 🔹 บาง API ส่ง token ตรงนี้
+    (req.headers.authorization?.startsWith("Bearer ")        // 🔸 Firebase / OAuth
+      ? req.headers.authorization.split("Bearer ")[1]
+      : req.headers.authorization);                          // 🔹 ถ้า auth แต่ไม่ใช่ Bearer
 
-  if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing or invalid token" });
+  if (!token) {
+    return res.status(401).json({ error: "❌ No token found" });
   }
 
-  const token = authHeader.split("Bearer ")[1];
-
   res.status(200).json({
-    message: "Token received ✅",
-    token, // ส่ง token กลับมา (เพื่อ debug ดูใน client)
+    message: "✅ Token received",
+    token,
   });
 }
