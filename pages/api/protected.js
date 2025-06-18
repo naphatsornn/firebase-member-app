@@ -1,17 +1,23 @@
+// pages/api/protected.js
+
 export default function handler(req, res) {
-  // ✅ ดึง token จาก header: ทั้ง Authorization และ TMN-Access-Token
   const token =
-    req.headers['tmn-access-token'] || // Truemoney ส่ง header นี้มา
-    req.headers.authorization?.split(" ")[1]; // หรือแบบ Authorization: Bearer <token>
+    req.headers['tmn-access-token'] ||
+    req.headers['x-access-token'] ||
+    (req.headers.authorization?.startsWith("Bearer ")
+      ? req.headers.authorization.split("Bearer ")[1]
+      : null);
 
   if (!token) {
-    return res.status(401).json({ error: "❌ ไม่พบ Token ใน Header" });
+    return res.status(401).json({
+      error: "❌ Token not found in known headers",
+      allHeaders: req.headers,
+    });
   }
 
-  // ✅ ส่งกลับ token เพื่อ debug หรือใช้งานต่อ
-  res.status(200).json({
+  return res.status(200).json({
     message: "✅ Token received",
     token,
-    allHeaders: req.headers, // ⬅️ ส่ง header กลับมาด้วยเพื่อ debug
+    allHeaders: req.headers,
   });
 }
