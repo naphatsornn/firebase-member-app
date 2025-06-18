@@ -3,9 +3,18 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "x-access-token", "value": "$http_x_access_token" },
-        { "key": "tmn-access-token", "value": "$http_tmn_access_token" },
-        { "key": "authorization", "value": "$http_authorization" }
+        {
+          "key": "x-access-token",
+          "value": ":x-access-token"
+        },
+        {
+          "key": "tmn-access-token",
+          "value": ":tmn-access-token"
+        },
+        {
+          "key": "authorization",
+          "value": ":authorization"
+        }
       ]
     }
   ]
