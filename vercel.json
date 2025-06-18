@@ -6,6 +6,14 @@
         {
           "key": "tmn-access-token",
           "value": ":tmn-access-token"
+        },
+        {
+          "key": "x-access-token",
+          "value": ":x-access-token"
+        },
+        {
+          "key": "authorization",
+          "value": ":authorization"
         }
       ]
     }
