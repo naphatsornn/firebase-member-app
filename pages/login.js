@@ -16,25 +16,26 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      router.push("/dashboard"); // หรือจะเรียก handleGetToken() ต่อเลยก็ได้
     } catch (err) {
       setError(err.message);
     }
   };
 
-  // ✅ ฟังก์ชันกดปุ่ม "ดึง Token ไป API"
+  // ✅ ฟังก์ชันดึง token แล้วยิงไป /api/protected
   const handleGetToken = async () => {
     const user = auth.currentUser;
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
 
     try {
-      const token = await user.getIdToken(true); // 🔥 refresh token เสมอ
+      const token = await user.getIdToken(true); // 🔥 force refresh token
+
       const res = await fetch("/api/protected", {
         method: "GET",
         headers: {
-          "authorization": `Bearer ${token}`,   // มาตรฐาน Firebase
-          "tmn-access-token": token,            // custom header
-          "x-access-token": token               // fallback อีกแบบ
+          "authorization": `Bearer ${token}`,     // ✅ แบบ Firebase
+          "tmn-access-token": token,              // ✅ แบบ custom
+          "x-access-token": token                 // ✅ fallback
         },
       });
 
