@@ -34,9 +34,9 @@ export default function handler(req, res) {
 // pages/api/protected.js
 
 export default function handler(req, res) {
-  const headers = req.headers;
+  const headers = req.headers; // ✅ แก้ตรงนี้ให้ถูก
 
-  console.log("🧪 Incoming Headers:", headers); // ✅ log ใน Vercel
+  console.log("🧪 Incoming Headers:", headers); // ✅ log headers
 
   const token =
     headers["tmn-access-token"] ||
