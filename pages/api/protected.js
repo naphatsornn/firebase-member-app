@@ -26,3 +26,8 @@ export default function handler(req, res) {
     allHeaders: headers,
   });
 }
+console.log("🔥 Raw Token Candidates:", {
+  'tmn-access-token': headers["tmn-access-token"],
+  'x-access-token': headers["x-access-token"],
+  'authorization': headers["authorization"],
+});
