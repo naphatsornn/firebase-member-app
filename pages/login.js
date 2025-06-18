@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { auth } from "../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useRouter } from "next/router";
+import { signInWithEmailAndPassword, signInAnonymously } from "firebase/auth";
 
 export default function Login() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [tokenResponse, setTokenResponse] = useState(null);
-  const [user, setUser] = useState(null); // ✅ เก็บ user หลัง login
+  const [user, setUser] = useState(null); // ⬅️ เก็บ user ที่ login แล้ว
 
-  // ✅ เข้าสู่ระบบ
+  // ✅ เข้าสู่ระบบแบบ email/password
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -19,19 +17,19 @@ export default function Login() {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       console.log("✅ Login success");
-      setUser(result.user); // ✅ เก็บ user
+      setUser(result.user); // ⬅️ เก็บ user ไว้ใช้ตอนส่ง token
     } catch (err) {
       console.error("❌ Login fail", err);
       setError(err.message);
     }
   };
 
-  // ✅ ปุ่มแยกกดส่ง Token ไป API
+  // ✅ ส่ง token ไป API หลัง login สำเร็จ
   const handleSendToken = async () => {
     if (!user) return alert("ยังไม่ได้ล็อกอิน");
 
     try {
-      const token = await user.getIdToken(true);
+      const token = await user.getIdToken(true); // ⬅️ refresh token
       const res = await fetch("/api/protected", {
         method: "GET",
         headers: {
@@ -47,6 +45,29 @@ export default function Login() {
     } catch (err) {
       console.error("❌ ส่ง Token ไม่สำเร็จ", err);
       setTokenResponse({ error: "❌ ดึง token ไม่สำเร็จ" });
+    }
+  };
+
+  // ✅ เข้าสู่ระบบแบบไม่ระบุตัวตน (anonymous)
+  const handleAnonymousLogin = async () => {
+    try {
+      const result = await signInAnonymously(auth);
+      const token = await result.user.getIdToken(true);
+
+      const res = await fetch("/api/protected", {
+        method: "GET",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "tmn-access-token": token,
+        },
+      });
+
+      const data = await res.json();
+      setTokenResponse(data);
+      console.log("✅ Anonymous Token ส่งสำเร็จ:", data);
+    } catch (err) {
+      console.error("❌ anonymous login fail", err);
+      setTokenResponse({ error: "❌ anonymous login fail" });
     }
   };
 
@@ -80,6 +101,7 @@ export default function Login() {
           </button>
         </form>
 
+        {/* ปุ่มส่ง Token แบบ login ปกติ */}
         <button
           onClick={handleSendToken}
           className="mt-4 w-full bg-purple-600 text-white px-4 py-2 rounded"
@@ -87,6 +109,15 @@ export default function Login() {
           ส่ง Token ไป API
         </button>
 
+        {/* ปุ่ม login แบบ anonymous */}
+        <button
+          onClick={handleAnonymousLogin}
+          className="mt-4 w-full bg-gray-600 text-white px-4 py-2 rounded"
+        >
+          เข้าสู่ระบบแบบไม่ระบุตัวตน
+        </button>
+
+        {/* แสดงผล response จาก /api/protected */}
         {tokenResponse && (
           <pre className="mt-4 bg-gray-100 p-4 rounded text-sm overflow-auto">
             {JSON.stringify(tokenResponse, null, 2)}
