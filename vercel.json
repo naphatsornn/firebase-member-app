@@ -5,15 +5,15 @@
       "headers": [
         {
           "key": "tmn-access-token",
-          "value": "tmn-access-token"
+          "value": "*"
         },
         {
           "key": "x-access-token",
-          "value": "x-access-token"
+          "value": "*"
         },
         {
           "key": "authorization",
-          "value": "authorization"
+          "value": "*"
         }
       ]
     }
