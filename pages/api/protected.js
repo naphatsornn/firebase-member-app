@@ -1,20 +1,21 @@
 // pages/api/protected.js
-
 export default function handler(req, res) {
   const headers = req.headers;
 
-  // ✅ รองรับทุกเคส: tmn-access-token, x-access-token, Authorization: Bearer <token>
+  // ลอง log ทุก headers ที่ถูกส่งมาจริง
+  console.log("🧪 Incoming Headers:", headers);
+
   const token =
-    headers['tmn-access-token'] ||
-    headers['x-access-token'] ||
+    headers["tmn-access-token"] ||
+    headers["x-access-token"] ||
     (headers.authorization?.startsWith("Bearer ")
       ? headers.authorization.split("Bearer ")[1]
       : null);
 
   if (!token) {
     return res.status(401).json({
-      error: "❌ Token not found in known headers",
-      allHeaders: headers, // debug headers ทั้งหมด
+      error: "❌ Token not found",
+      allHeaders: headers,
     });
   }
 
