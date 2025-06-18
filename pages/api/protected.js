@@ -1,7 +1,12 @@
 export default function handler(req, res) {
   const headers = req.headers;
 
-  console.log("🧪 Incoming Headers:", headers);
+  // ✅ LOG ที่ถูกต้อง
+  console.log("🔥 Raw Token Candidates:", {
+    'tmn-access-token': headers["tmn-access-token"],
+    'x-access-token': headers["x-access-token"],
+    'authorization': headers["authorization"],
+  });
 
   const token =
     headers["tmn-access-token"] ||
@@ -26,8 +31,3 @@ export default function handler(req, res) {
     allHeaders: headers,
   });
 }
-console.log("🔥 Raw Token Candidates:", {
-  'tmn-access-token': headers["tmn-access-token"],
-  'x-access-token': headers["x-access-token"],
-  'authorization': headers["authorization"],
-});
