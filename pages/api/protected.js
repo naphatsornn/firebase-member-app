@@ -31,3 +31,23 @@ export default function handler(req, res) {
     allHeaders: headers,
   });
 }
+// pages/api/protected.js
+
+export default function handler(req, res) {
+  const headers = req.headers;
+
+  console.log("🧪 Incoming Headers:", headers); // ✅ log ใน Vercel
+
+  const token =
+    headers["tmn-access-token"] ||
+    headers["x-access-token"] ||
+    (headers.authorization?.startsWith("Bearer ")
+      ? headers.authorization.split("Bearer ")[1]
+      : null);
+
+  return res.status(200).json({
+    message: "✅ Token received (หรือไม่)",
+    token,
+    allHeaders: headers,
+  });
+}
