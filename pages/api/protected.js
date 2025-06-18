@@ -7,8 +7,9 @@ export default function handler(req, res) {
     (headers["authorization"]?.startsWith("Bearer ")
       ? headers["authorization"].split("Bearer ")[1]
       : null);
-
-  console.log("🔥 Raw Token Candidates:", {
+      console.log("🔥 Token from header:", token);
+  
+      console.log("🔥 Raw Token Candidates:", {
     "tmn-access-token": headers["tmn-access-token"],
     "x-access-token": headers["x-access-token"],
     authorization: headers["authorization"],
