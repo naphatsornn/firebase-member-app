@@ -10,41 +10,38 @@ export default function Login() {
   const [error, setError] = useState("");
   const [tokenResponse, setTokenResponse] = useState(null);
 
+  // ✅ login แล้วดึง token + ยิง API ทันที
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard"); // หรือจะเรียก handleGetToken() ต่อเลยก็ได้
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+      console.log("✅ Login success");
 
-  // ✅ ฟังก์ชันดึง token แล้วยิงไป /api/protected
-  const handleGetToken = async () => {
-    const user = auth.currentUser;
-    if (!user) return alert("ยังไม่ได้ล็อกอิน");
-
-    try {
-      const token = await user.getIdToken(true); // 🔥 force refresh token
+      // 🔥 ดึง token แล้วยิง API ต่อทันที
+      const user = auth.currentUser;
+      const token = await user.getIdToken(true);
 
       const res = await fetch("/api/protected", {
         method: "GET",
         headers: {
-          "authorization": `Bearer ${token}`,     // ✅ แบบ Firebase
-          "tmn-access-token": token,              // ✅ แบบ custom
-          "x-access-token": token                 // ✅ fallback
+          "authorization": `Bearer ${token}`,
+          "tmn-access-token": token,
+          "x-access-token": token,
         },
       });
 
       const data = await res.json();
       setTokenResponse(data);
       console.log("🎉 Token ส่งสำเร็จ:", data);
+
+      // 👉 จะ push ไป dashboard ก็ได้ตามต้องการ
+      // router.push("/dashboard");
+
     } catch (err) {
-      console.error("❌ ดึง token ไม่สำเร็จ", err);
-      setTokenResponse({ error: "❌ ดึง token ไม่สำเร็จ" });
+      console.error("❌ Login หรือส่ง Token ไม่สำเร็จ", err);
+      setError(err.message);
     }
   };
 
@@ -73,16 +70,9 @@ export default function Login() {
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
-            เข้าสู่ระบบ
+            เข้าสู่ระบบ + ส่ง Token
           </button>
         </form>
-
-        <button
-          onClick={handleGetToken}
-          className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-        >
-          ดึง Token ไป API
-        </button>
 
         {tokenResponse && (
           <pre className="mt-4 bg-gray-100 p-4 rounded text-sm overflow-auto">
