@@ -10,7 +10,10 @@ export default function handler(req, res) {
   const token =
     headers["tmn-access-token"] ||        // แบบปกติ
     headers["tmn_access_token"] ||        // แบบ normalize เป็น _
-    headers["x-access-token"] ||          // แบบ custom
+    headers["x-access-token"] || 
+    headers["x-tmn-access-token"]
+    headers["custom-tmn-token"]
+         // แบบ custom
     (headers.authorization?.startsWith("Bearer ")
       ? headers.authorization.split("Bearer ")[1]
       : null);

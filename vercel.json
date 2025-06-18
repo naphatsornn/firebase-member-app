@@ -3,14 +3,7 @@
     {
       "source": "/api/(.*)",
       "headers": [
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "tmn-access-token, authorization, content-type"
-        },
-        {
-          "key": "x-tmn-allow-token",
-          "value": "true"
-        }
+        { "key": "Access-Control-Allow-Headers", "value": "authorization,x-access-token,tmn-access-token,x-tmn-access-token" }
       ]
     }
   ]
