@@ -1,4 +1,3 @@
-// ✅ ไม่มี export config (ใช้ default serverless runtime)
 export default function handler(req, res) {
   const headers = req.headers;
 
